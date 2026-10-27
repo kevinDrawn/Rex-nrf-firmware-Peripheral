@@ -1,0 +1,61 @@
+&pinctrl {
+    spi1_default: spi1_default {
+        group1 {
+            psels = <NRF_PSEL(SPIM_SCK, 0, 7)>,
+                    <NRF_PSEL(SPIM_MOSI, 0, 6)>,
+                    <NRF_PSEL(SPIM_MISO, 0, 16)>;
+        };
+    };
+
+    spi1_sleep: spi1_sleep {
+        group1 {
+            psels = <NRF_PSEL(SPIM_SCK, 0, 7)>,
+                    <NRF_PSEL(SPIM_MOSI, 0, 6)>,
+                    <NRF_PSEL(SPIM_MISO, 0, 16)>;
+            low-power-enable;
+        };
+    };
+
+};
+
+/ {
+        ads1294_ctrl {
+                compatible = "gpio-leds";
+                ads1294_start: ads1294_start {
+                        gpios = <&gpio0 18 GPIO_ACTIVE_HIGH>;
+                };
+
+                ads1294_reset_pwdn: ads1294_reset_pwdn {
+                        gpios = <&gpio0 17 GPIO_ACTIVE_LOW>;
+                };
+        };
+
+        ads1294_data_ready {
+                compatible = "gpio-keys";
+                ads1294_drdy: ads1294_drdy {
+                        gpios = <&gpio0 15 GPIO_ACTIVE_LOW>;
+                };
+        };
+};
+
+// AFE - [ADS1294 SPI]
+&spi1 {
+        compatible = "nordic,nrf-spi";
+        status = "okay";
+        cs-gpios = <&gpio0 19 GPIO_ACTIVE_LOW>; // CS pin on P0.05
+        pinctrl-0 = <&spi1_default>;
+        pinctrl-1 = <&spi1_sleep>;
+        pinctrl-names = "default", "sleep";
+        ads1294: ads1294@0 {
+                compatible = "vnd,spi-device";
+                reg = <0>;
+                spi-max-frequency = <1600000>;
+        };
+};
+
+&uart0 {
+	current-speed = <460800>;
+	status = "okay";
+	pinctrl-0 = <&uart0_default>;
+	pinctrl-names = "default";
+};

@@ -1,0 +1,10 @@
+identifier: nrf52832_dm_s/nrf52832
+name: 2025_08_08_nrf52832_dm_s
+vendor: DM-Tech
+type: mcu
+arch: arm
+ram: 64
+flash: 512
+toolchain:
+  - zephyr
+supported: []
