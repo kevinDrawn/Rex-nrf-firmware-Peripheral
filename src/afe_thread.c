@@ -51,7 +51,6 @@ static void afe_thread(void *a, void *b, void *c)
     ARG_UNUSED(a);
     ARG_UNUSED(b);
     ARG_UNUSED(c);
-
     k_sem_take(&afe_start_sem, K_FOREVER);
 
     while (1) {
@@ -66,8 +65,12 @@ static void afe_thread(void *a, void *b, void *c)
 
         // EMG ESB 전송 큐 저장 
         emg.sequence = sequence++;
-        emg.ch1_tibialis = frame.channel[0];
-        emg.ch2_gastrocnemius = frame.channel[1];
+        emg.ch1_l_tibialis = frame.channel[0];
+        emg.ch2_l_gastrocnemius = frame.channel[1];
+#if defined(CONFIG_EMG_BILATERAL)
+        emg.ch3_r_tibialis = frame.channel[2];
+        emg.ch4_r_gastrocnemius = frame.channel[3];
+#endif 
 
         rc = k_msgq_put(&emg_queue, &emg, K_NO_WAIT);
         if (rc) {

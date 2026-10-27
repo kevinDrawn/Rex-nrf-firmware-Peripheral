@@ -4,6 +4,10 @@
 # SPDX-License-Identifier: LicenseRef-Nordic-5-Clause
 #
 
+# Set this before SDK defaults so bilateral builds actually get 44 bytes.
+config ESB_MAX_PAYLOAD_LENGTH
+    default 44 if EMG_BILATERAL
+
 source "Kconfig.zephyr"
 
 menu "Enhanced ShockBurst: Transmitter"
@@ -35,3 +39,18 @@ config EMG_MODE
       Enable this to use Sequence, Tibial Muscle, Gastrocnemius Muscle channels for SPI DRDY.
 
 endmenu
+
+
+choice EMG_CHANNEL_MODE
+    prompt "EMG channel configuration"
+    depends on EMG_MODE
+    default EMG_UNILATERAL
+
+config EMG_UNILATERAL
+    bool "Unilateral EMG (ADS1294 Ch1 and Ch2)"
+
+config EMG_BILATERAL
+    bool "Bilateral EMG (ADS1294 Ch1 through Ch4)"
+
+endchoice
+

@@ -7,8 +7,12 @@
 
 typedef struct {
     uint32_t sequence;
-    int32_t ch1_tibialis;
-    int32_t ch2_gastrocnemius;
+    int32_t ch1_l_tibialis;
+    int32_t ch2_l_gastrocnemius;
+#if defined(CONFIG_EMG_BILATERAL)
+    int32_t ch3_r_tibialis;
+    int32_t ch4_r_gastrocnemius;
+#endif
 } emg_sample_t;
 
 void afe_thread_start(void);

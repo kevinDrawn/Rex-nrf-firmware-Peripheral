@@ -24,19 +24,6 @@ struct esb_payload tx_payload = {
     .length = SENSOR_PAYLOAD_LEN,
 };
 
-static int16_t emg_i32_to_i16(int32_t value)
-{
-    if (value > INT16_MAX) {
-        return INT16_MAX;
-    }
-
-    if (value < INT16_MIN) {
-        return INT16_MIN;
-    }
-
-    return (int16_t)value;
-}
-
 static void put_i16_be(uint8_t *data, uint8_t offset, int16_t value)
 {
     data[offset] = (uint8_t)((uint16_t)value >> 8);
@@ -86,10 +73,17 @@ void make_payload_emg(int16_t left_angle,
     memset(tx_payload.data, 0, sizeof(tx_payload.data));
 
     // EMG는 int32_t 원본 그대로 사용
-    int32_t tb_emg_1 = emg1->ch1_tibialis;
-    int32_t gt_emg_1 = emg1->ch2_gastrocnemius;
-    int32_t tb_emg_2 = emg2->ch1_tibialis;
-    int32_t gt_emg_2 = emg2->ch2_gastrocnemius;
+    int32_t l_tb_emg_1 = emg1->ch1_l_tibialis;
+    int32_t l_gt_emg_1 = emg1->ch2_l_gastrocnemius;
+    int32_t l_tb_emg_2 = emg2->ch1_l_tibialis;
+    int32_t l_gt_emg_2 = emg2->ch2_l_gastrocnemius;
+
+#if defined(CONFIG_EMG_BILATERAL)
+    int32_t r_tb_emg_1 = emg1->ch3_r_tibialis;
+    int32_t r_gt_emg_1 = emg1->ch4_r_gastrocnemius;
+    int32_t r_tb_emg_2 = emg2->ch3_r_tibialis;
+    int32_t r_gt_emg_2 = emg2->ch4_r_gastrocnemius;
+#endif
 
     put_u16_be(tx_payload.data, 0, packet_seq++);
 
@@ -102,10 +96,18 @@ void make_payload_emg(int16_t left_angle,
     put_i16_be(tx_payload.data, 10, right_torque);
 
     // EMG: int32_t → 4 bytes
-    put_i32_be(tx_payload.data, 12, tb_emg_1);
-    put_i32_be(tx_payload.data, 16, gt_emg_1);
-    put_i32_be(tx_payload.data, 20, tb_emg_2);
-    put_i32_be(tx_payload.data, 24, gt_emg_2);
+    put_i32_be(tx_payload.data, 12, l_tb_emg_1);
+    put_i32_be(tx_payload.data, 16, l_gt_emg_1);
+    put_i32_be(tx_payload.data, 20, l_tb_emg_2);
+    put_i32_be(tx_payload.data, 24, l_gt_emg_2);
+
+	// EMG: int32_t → 4 bytes
+#if defined(CONFIG_EMG_BILATERAL)
+    put_i32_be(tx_payload.data, 28, r_tb_emg_1);
+    put_i32_be(tx_payload.data, 32, r_gt_emg_1);
+    put_i32_be(tx_payload.data, 36, r_tb_emg_2);
+    put_i32_be(tx_payload.data, 40, r_gt_emg_2);
+#endif
 
     tx_payload.length = SENSOR_PAYLOAD_LEN;
 }

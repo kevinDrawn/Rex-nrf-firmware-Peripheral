@@ -28,7 +28,17 @@
 	 RADIO_SHORTS_ADDRESS_RSSISTART_Msk |                                  \
 	 RADIO_SHORTS_DISABLED_RSSISTOP_Msk)
 
-#define SENSOR_PAYLOAD_LEN 28 // Hall + Torque + EMG
+// Two consecutive time samples per packet, raw signed int32 EMG.
+// Preserve the original first 28 bytes; append right EMG in bilateral mode.
+#if defined(CONFIG_EMG_BILATERAL)
+#define SENSOR_PAYLOAD_LEN (12 + 16 + 16)
+#else
+#define SENSOR_PAYLOAD_LEN (12 + 16)
+#endif
+
+#if SENSOR_PAYLOAD_LEN > CONFIG_ESB_MAX_PAYLOAD_LENGTH
+#error "ESB buffer is too small for the selected EMG mode"
+#endif
 
 #define PAYLOAD_FLAG_EMG_UNDERFLOW      BIT(0)
 #define PAYLOAD_FLAG_EMG_SEQUENCE_ERROR BIT(1)

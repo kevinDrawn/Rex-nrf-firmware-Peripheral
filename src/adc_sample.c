@@ -90,8 +90,8 @@ void saadc_esb_send(struct k_work *item)
 	int16_t l_torque = 0;
 	int16_t r_torque = 0;
 
-	emg_sample_t emg1 = {0};
-	emg_sample_t emg2 = {0};
+	emg_sample_t emg1 = {0}; // Channel 1
+	emg_sample_t emg2 = {0}; // Channel 2
 
 #if defined(CONFIG_HALL_MODE)
 		
@@ -138,7 +138,6 @@ void saadc_esb_send(struct k_work *item)
         }
 
     } else {
-
         /* 아직 EMG sample 2개가 준비되지 않음 */
         emg_underflow_count++;
         flags |= PAYLOAD_FLAG_EMG_UNDERFLOW;
