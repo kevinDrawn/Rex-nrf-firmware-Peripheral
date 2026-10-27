@@ -30,14 +30,14 @@ static void put_i16_be(uint8_t *data, uint8_t offset, int16_t value)
     data[offset + 1] = (uint8_t)((uint16_t)value & 0xFF);
 }
 
-static inline void put_i32_be(uint8_t *buf, int offset, int32_t value)
+static inline void put_i24_be(uint8_t *buf, int offset, int32_t value)
 {
     uint32_t v = (uint32_t)value;
 
-    buf[offset + 0] = (uint8_t)((v >> 24) & 0xFF);
-    buf[offset + 1] = (uint8_t)((v >> 16) & 0xFF);
-    buf[offset + 2] = (uint8_t)((v >> 8)  & 0xFF);
-    buf[offset + 3] = (uint8_t)(v & 0xFF);
+    // Keep the original signed 24-bit two's-complement representation.
+    buf[offset + 0] = (uint8_t)((v >> 16) & 0xFF);
+    buf[offset + 1] = (uint8_t)((v >> 8) & 0xFF);
+    buf[offset + 2] = (uint8_t)(v & 0xFF);
 }
 
 static void put_u16_be(uint8_t *data, uint8_t offset, uint16_t value)
@@ -95,18 +95,18 @@ void make_payload_emg(int16_t left_angle,
     put_i16_be(tx_payload.data, 8, left_torque);
     put_i16_be(tx_payload.data, 10, right_torque);
 
-    // EMG: int32_t → 4 bytes
-    put_i32_be(tx_payload.data, 12, l_tb_emg_1);
-    put_i32_be(tx_payload.data, 16, l_gt_emg_1);
-    put_i32_be(tx_payload.data, 20, l_tb_emg_2);
-    put_i32_be(tx_payload.data, 24, l_gt_emg_2);
+    // EMG: signed 24-bit, 3 bytes per channel.
+    put_i24_be(tx_payload.data, 12, l_tb_emg_1);
+    put_i24_be(tx_payload.data, 15, l_gt_emg_1);
+    put_i24_be(tx_payload.data, 18, l_tb_emg_2);
+    put_i24_be(tx_payload.data, 21, l_gt_emg_2);
 
-	// EMG: int32_t → 4 bytes
+    // EMG: signed 24-bit, 3 bytes per channel.
 #if defined(CONFIG_EMG_BILATERAL)
-    put_i32_be(tx_payload.data, 28, r_tb_emg_1);
-    put_i32_be(tx_payload.data, 32, r_gt_emg_1);
-    put_i32_be(tx_payload.data, 36, r_tb_emg_2);
-    put_i32_be(tx_payload.data, 40, r_gt_emg_2);
+    put_i24_be(tx_payload.data, 24, r_tb_emg_1);
+    put_i24_be(tx_payload.data, 27, r_gt_emg_1);
+    put_i24_be(tx_payload.data, 30, r_tb_emg_2);
+    put_i24_be(tx_payload.data, 33, r_gt_emg_2);
 #endif
 
     tx_payload.length = SENSOR_PAYLOAD_LEN;

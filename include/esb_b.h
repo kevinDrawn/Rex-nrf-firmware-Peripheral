@@ -28,12 +28,12 @@
 	 RADIO_SHORTS_ADDRESS_RSSISTART_Msk |                                  \
 	 RADIO_SHORTS_DISABLED_RSSISTOP_Msk)
 
-// Two consecutive time samples per packet, raw signed int32 EMG.
-// Preserve the original first 28 bytes; append right EMG in bilateral mode.
+// Two consecutive time samples per packet, raw signed 24-bit EMG.
+// 12-byte header followed by left EMG, then right EMG in bilateral mode.
 #if defined(CONFIG_EMG_BILATERAL)
-#define SENSOR_PAYLOAD_LEN (12 + 16 + 16)
+#define SENSOR_PAYLOAD_LEN (12 + 12 + 12)
 #else
-#define SENSOR_PAYLOAD_LEN (12 + 16)
+#define SENSOR_PAYLOAD_LEN (12 + 12)
 #endif
 
 #if SENSOR_PAYLOAD_LEN > CONFIG_ESB_MAX_PAYLOAD_LENGTH
