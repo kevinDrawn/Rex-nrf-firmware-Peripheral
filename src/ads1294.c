@@ -284,7 +284,6 @@ int ads1294_apply_config(uint8_t mode)
     return 0;
 }
 
-
 static const char *ads_mode_to_string(int mode)
 {
     switch (mode) {

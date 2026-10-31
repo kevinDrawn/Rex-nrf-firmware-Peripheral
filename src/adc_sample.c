@@ -90,8 +90,8 @@ void saadc_esb_send(struct k_work *item)
 	int16_t l_torque = 0;
 	int16_t r_torque = 0;
 
-	emg_sample_t emg1 = {0}; // Channel 1
-	emg_sample_t emg2 = {0}; // Channel 2
+	emg_sample_t emg1 = {0}; // Sample 1  
+	emg_sample_t emg2 = {0}; // Sample 2 
 
 #if defined(CONFIG_HALL_MODE)
 		
@@ -124,7 +124,7 @@ void saadc_esb_send(struct k_work *item)
 
         int rc1 = afe_thread_get_sample(&emg1, K_NO_WAIT);
         int rc2 = afe_thread_get_sample(&emg2, K_NO_WAIT);
-
+		
         if (rc1 != 0 || rc2 != 0) {
             emg_underflow_count++;
             flags |= PAYLOAD_FLAG_EMG_UNDERFLOW;

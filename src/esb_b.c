@@ -24,10 +24,32 @@ struct esb_payload tx_payload = {
     .length = SENSOR_PAYLOAD_LEN,
 };
 
+static int16_t emg_i32_to_i16(int32_t value)
+{
+    if (value > INT16_MAX) {
+        return INT16_MAX;
+    }
+
+    if (value < INT16_MIN) {
+        return INT16_MIN;
+    }
+
+    return (int16_t)value;
+}
+
 static void put_i16_be(uint8_t *data, uint8_t offset, int16_t value)
 {
     data[offset] = (uint8_t)((uint16_t)value >> 8);
     data[offset + 1] = (uint8_t)((uint16_t)value & 0xFF);
+}
+
+static void put_i24_be(uint8_t *buf, int offset, int32_t value)
+{
+    uint32_t v = (uint32_t)value;
+
+    buf[offset]     = (uint8_t)(v >> 16);
+    buf[offset + 1] = (uint8_t)(v >> 8);
+    buf[offset + 2] = (uint8_t)v;
 }
 
 static inline void put_i32_be(uint8_t *buf, int offset, int32_t value)
@@ -78,12 +100,10 @@ void make_payload_emg(int16_t left_angle,
     int32_t l_tb_emg_2 = emg2->ch1_l_tibialis;
     int32_t l_gt_emg_2 = emg2->ch2_l_gastrocnemius;
 
-#if defined(CONFIG_EMG_BILATERAL)
     int32_t r_tb_emg_1 = emg1->ch3_r_tibialis;
     int32_t r_gt_emg_1 = emg1->ch4_r_gastrocnemius;
     int32_t r_tb_emg_2 = emg2->ch3_r_tibialis;
     int32_t r_gt_emg_2 = emg2->ch4_r_gastrocnemius;
-#endif
 
     put_u16_be(tx_payload.data, 0, packet_seq++);
 
@@ -95,22 +115,23 @@ void make_payload_emg(int16_t left_angle,
     put_i16_be(tx_payload.data, 8, left_torque);
     put_i16_be(tx_payload.data, 10, right_torque);
 
-    // EMG: int32_t → 4 bytes
-    put_i32_be(tx_payload.data, 12, l_tb_emg_1);
-    put_i32_be(tx_payload.data, 16, l_gt_emg_1);
-    put_i32_be(tx_payload.data, 20, l_tb_emg_2);
-    put_i32_be(tx_payload.data, 24, l_gt_emg_2);
+	// Left: 2 channels × 2 samples × 3 bytes = 12 bytes
+	put_i24_be(tx_payload.data, 12, l_tb_emg_1);
+	put_i24_be(tx_payload.data, 15, l_gt_emg_1);
+	put_i24_be(tx_payload.data, 18, l_tb_emg_2);
+	put_i24_be(tx_payload.data, 21, l_gt_emg_2);
 
-	// EMG: int32_t → 4 bytes
-#if defined(CONFIG_EMG_BILATERAL)
-    put_i32_be(tx_payload.data, 28, r_tb_emg_1);
-    put_i32_be(tx_payload.data, 32, r_gt_emg_1);
-    put_i32_be(tx_payload.data, 36, r_tb_emg_2);
-    put_i32_be(tx_payload.data, 40, r_gt_emg_2);
-#endif
-
+	#if defined(CONFIG_EMG_BILATERAL)
+	// Right: 2 channels × 2 samples × 3 bytes = 12 bytes
+	put_i24_be(tx_payload.data, 24, r_tb_emg_1);
+	put_i24_be(tx_payload.data, 27, r_gt_emg_1);
+	put_i24_be(tx_payload.data, 30, r_tb_emg_2);
+	put_i24_be(tx_payload.data, 33, r_gt_emg_2);
+	#endif
+	
     tx_payload.length = SENSOR_PAYLOAD_LEN;
 }
+
 // ESB 콜백 이벤트 처리 함수
 static void event_handler(struct esb_evt const *event)
 {

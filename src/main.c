@@ -77,7 +77,6 @@ int main(void)
 
     while (1) {
         k_sleep(K_SECONDS(1));
-
         // AFE + Que Debugging
         // LOG_INF("AFE=%u q_drop=%u q_used=%u "
         //         "under=%u seq=%u",

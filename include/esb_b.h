@@ -31,9 +31,9 @@
 // Two consecutive time samples per packet, raw signed int32 EMG.
 // Preserve the original first 28 bytes; append right EMG in bilateral mode.
 #if defined(CONFIG_EMG_BILATERAL)
-#define SENSOR_PAYLOAD_LEN (12 + 16 + 16)
+#define SENSOR_PAYLOAD_LEN (12 + 12 + 12)
 #else
-#define SENSOR_PAYLOAD_LEN (12 + 16)
+#define SENSOR_PAYLOAD_LEN (12 + 12)
 #endif
 
 #if SENSOR_PAYLOAD_LEN > CONFIG_ESB_MAX_PAYLOAD_LENGTH
