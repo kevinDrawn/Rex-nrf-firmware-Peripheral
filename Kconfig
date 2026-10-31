@@ -4,10 +4,6 @@
 # SPDX-License-Identifier: LicenseRef-Nordic-5-Clause
 #
 
-# Set this before SDK defaults so bilateral builds actually get 44 bytes.
-config ESB_MAX_PAYLOAD_LENGTH
-    default 44 if EMG_BILATERAL
-
 source "Kconfig.zephyr"
 
 menu "Enhanced ShockBurst: Transmitter"

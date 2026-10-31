@@ -43,23 +43,14 @@ static void put_i16_be(uint8_t *data, uint8_t offset, int16_t value)
     data[offset + 1] = (uint8_t)((uint16_t)value & 0xFF);
 }
 
-static void put_i24_be(uint8_t *buf, int offset, int32_t value)
+static inline void put_i24_be(uint8_t *buf, int offset, int32_t value)
 {
     uint32_t v = (uint32_t)value;
 
-    buf[offset]     = (uint8_t)(v >> 16);
-    buf[offset + 1] = (uint8_t)(v >> 8);
-    buf[offset + 2] = (uint8_t)v;
-}
-
-static inline void put_i32_be(uint8_t *buf, int offset, int32_t value)
-{
-    uint32_t v = (uint32_t)value;
-
-    buf[offset + 0] = (uint8_t)((v >> 24) & 0xFF);
-    buf[offset + 1] = (uint8_t)((v >> 16) & 0xFF);
-    buf[offset + 2] = (uint8_t)((v >> 8)  & 0xFF);
-    buf[offset + 3] = (uint8_t)(v & 0xFF);
+    // Keep the original signed 24-bit two's-complement representation.
+    buf[offset + 0] = (uint8_t)((v >> 16) & 0xFF);
+    buf[offset + 1] = (uint8_t)((v >> 8) & 0xFF);
+    buf[offset + 2] = (uint8_t)(v & 0xFF);
 }
 
 static void put_u16_be(uint8_t *data, uint8_t offset, uint16_t value)
