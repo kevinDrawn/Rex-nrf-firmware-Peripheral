@@ -67,19 +67,17 @@ static void afe_thread(void *a, void *b, void *c)
         emg.sequence = sequence++;
         emg.ch1_l_tibialis = frame.channel[0];
         emg.ch2_l_gastrocnemius = frame.channel[1];
-#if defined(CONFIG_EMG_BILATERAL)
         emg.ch3_r_tibialis = frame.channel[2];
-        emg.ch4_r_gastrocnemius = frame.channel[3];
-#endif 
+        emg.ch4_r_gastrocnemius = frame.channel[3]; 
 
         rc = k_msgq_put(&emg_queue, &emg, K_NO_WAIT);
         if (rc) {
             emg_queue_drop_count++;
         }
 
-        // // UART 로깅 데이터 TX 송신
-        // uint8_t uart_frame[UART_FRAME_LEN];
-        // size_t off = 0;
+        // UART 로깅 데이터 TX 송신
+        uint8_t uart_frame[UART_FRAME_LEN];
+        size_t off = 0;
 
         // /* Header */
         // uart_frame[off++] = 0xAA;
@@ -95,6 +93,20 @@ static void afe_thread(void *a, void *b, void *c)
         // /* CH2 : int32_t */
         // memcpy(&uart_frame[off],
         //        &frame.channel[1],
+        //        sizeof(int32_t));
+
+        // off += sizeof(int32_t);
+
+        // /* CH3 : int32_t */
+        // memcpy(&uart_frame[off],
+        //        &frame.channel[2],
+        //        sizeof(int32_t));
+
+        // off += sizeof(int32_t);
+
+        // /* CH4 : int32_t */
+        // memcpy(&uart_frame[off],
+        //        &frame.channel[3],
         //        sizeof(int32_t));
 
         // off += sizeof(int32_t);

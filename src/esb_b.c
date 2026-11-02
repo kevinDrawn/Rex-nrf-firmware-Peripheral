@@ -23,6 +23,19 @@ struct esb_payload tx_payload = {
     .length = SENSOR_PAYLOAD_LEN,
 };
 
+static int16_t emg_i32_to_i16(int32_t value)
+{
+    if (value > INT16_MAX) {
+        return INT16_MAX;
+    }
+
+    if (value < INT16_MIN) {
+        return INT16_MIN;
+    }
+
+    return (int16_t)value;
+}
+
 static void put_i16_be(uint8_t *data, uint8_t offset, int16_t value)
 {
     data[offset] = (uint8_t)((uint16_t)value >> 8);
@@ -77,12 +90,10 @@ void make_payload_emg(int16_t left_angle,
     int32_t l_tb_emg_2 = emg2->ch1_l_tibialis;
     int32_t l_gt_emg_2 = emg2->ch2_l_gastrocnemius;
 
-#if defined(CONFIG_EMG_BILATERAL)
     int32_t r_tb_emg_1 = emg1->ch3_r_tibialis;
     int32_t r_gt_emg_1 = emg1->ch4_r_gastrocnemius;
     int32_t r_tb_emg_2 = emg2->ch3_r_tibialis;
     int32_t r_gt_emg_2 = emg2->ch4_r_gastrocnemius;
-#endif
 
     put_u16_be(tx_payload.data, 0, packet_seq++);
 
@@ -94,20 +105,20 @@ void make_payload_emg(int16_t left_angle,
     put_i16_be(tx_payload.data, 8, left_torque);
     put_i16_be(tx_payload.data, 10, right_torque);
 
-    // EMG: signed 24-bit, 3 bytes per channel.
-    put_i24_be(tx_payload.data, 12, l_tb_emg_1);
-    put_i24_be(tx_payload.data, 15, l_gt_emg_1);
-    put_i24_be(tx_payload.data, 18, l_tb_emg_2);
-    put_i24_be(tx_payload.data, 21, l_gt_emg_2);
+	// Left: 2 channels × 2 samples × 3 bytes = 12 bytes
+	put_i24_be(tx_payload.data, 12, l_tb_emg_1);
+	put_i24_be(tx_payload.data, 15, l_gt_emg_1);
+	put_i24_be(tx_payload.data, 18, l_tb_emg_2);
+	put_i24_be(tx_payload.data, 21, l_gt_emg_2);
 
-    // EMG: signed 24-bit, 3 bytes per channel.
-#if defined(CONFIG_EMG_BILATERAL)
-    put_i24_be(tx_payload.data, 24, r_tb_emg_1);
-    put_i24_be(tx_payload.data, 27, r_gt_emg_1);
-    put_i24_be(tx_payload.data, 30, r_tb_emg_2);
-    put_i24_be(tx_payload.data, 33, r_gt_emg_2);
-#endif
-
+	#if defined(CONFIG_EMG_BILATERAL)
+	// Right: 2 channels × 2 samples × 3 bytes = 12 bytes
+	put_i24_be(tx_payload.data, 24, r_tb_emg_1);
+	put_i24_be(tx_payload.data, 27, r_gt_emg_1);
+	put_i24_be(tx_payload.data, 30, r_tb_emg_2);
+	put_i24_be(tx_payload.data, 33, r_gt_emg_2);
+	#endif
+	
     tx_payload.length = SENSOR_PAYLOAD_LEN;
 }
 
