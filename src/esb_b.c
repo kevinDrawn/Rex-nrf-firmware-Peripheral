@@ -6,7 +6,6 @@ bool ready=true;
 
 static volatile uint32_t esb_tx_success_count = 0;
 static volatile uint32_t esb_tx_failed_count = 0;
-
 static uint16_t packet_seq = 0;
 
 uint32_t get_esb_tx_success_count(void)
@@ -111,6 +110,7 @@ void make_payload_emg(int16_t left_angle,
 
     tx_payload.length = SENSOR_PAYLOAD_LEN;
 }
+
 // ESB 콜백 이벤트 처리 함수
 static void event_handler(struct esb_evt const *event)
 {
