@@ -20,7 +20,7 @@
 #define REX_ADS_MODE_LEADOFF_CHECK      2
 #define REX_ADS_MODE_RLD_RECORDING      3
 
-#define REX_ADS_ACTIVE_MODE             REX_ADS_MODE_RLD_RECORDING
+#define REX_ADS_ACTIVE_MODE             REX_ADS_MODE_TEST_SIGNAL
 
 typedef struct {
     uint8_t address;
