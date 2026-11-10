@@ -95,7 +95,7 @@ void saadc_esb_send(struct k_work *item)
 
 #if defined(CONFIG_HALL_MODE)
 		
-		// ADC 0~4096
+		//// ADC 0~4096
 		uint16_t l = ADC_left_angle;
 		uint16_t r = ADC_right_angle;
 		
@@ -103,13 +103,13 @@ void saadc_esb_send(struct k_work *item)
 		deg_left  = hall_lut_left[l];
 		deg_right = hall_lut_right[r];
 
-		// Hall Sensor ADC
-		// deg_left = l;
-		// deg_right = r;		
+		//// Hall Sensor ADC
+		deg_left = l;
+		deg_right = r;		
 
-		// Normalized Angle
-		// float Ap_left = Norm_ADC(l, 'H');
-		// float Ap_right = Norm_ADC(r, 'S');
+		//// Normalized Angle
+		// float Ap_left = Norm_ADC(l, LEFT_EXOSHOE_CHAR);
+		// float Ap_right = Norm_ADC(r, RIGHT_EXOSHOE_CHAR);
 		// deg_left = (int16_t) (Ap_left*100);
 		// deg_right = (int16_t) (Ap_right*100);
 #endif
