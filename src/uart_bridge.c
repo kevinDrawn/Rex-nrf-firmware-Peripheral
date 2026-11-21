@@ -3,15 +3,12 @@
 LOG_MODULE_REGISTER(uart_bridge_c, LOG_LEVEL_INF);
 
 #define DATA_UART_NODE DT_NODELABEL(uart0)
-
 static volatile bool tx_busy;
 static uint8_t tx_buf[UART_FRAME_LEN];
-
 const struct device *uart_dev;
 
 /* 10-byte frame × 64 */
 K_MSGQ_DEFINE(uart_tx_q, UART_FRAME_LEN, 64, 4);
-
 
 static void uart_evt_cb(const struct device *dev,
                         struct uart_event *evt,
